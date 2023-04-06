@@ -4,32 +4,54 @@ import pprint
 import os
 
 selectionDict = {
-    1: 'Check Vitamin Status',
-    2: 'Input Vitamin Status',
+    1: 'Check supplement Status',
+    2: 'Input supplement Status',
     3: 'Exit Program'
 }
 
-userDict = {
-    'Protien': '',
-    'Vitamins': '',
-    'Creatine': ''
-}
-
-def didYouTake(item:str, choice:int, userDict:dict):
-    today = date.today()
-    while True:
-        subChoice = input(f'Did you take your {item} (y/n)?: ').lower()
-        if subChoice == 'y':
-            userDict.update({item:str(today)})
-            with shelve.open('userData') as db:
-                db[item] = userDict[item]
-            
-            choice += 0.1
-            break
-        elif choice == 'n':
-            input(f"Go take your {item}")
+if os.path.exists('supplement.dat'):
+    with shelve.open('supplement') as db:
+        userDict = db
+        
+else:
+    supplement = 'blank'
+    userDict = {
     
-    return item, choice, userDict
+    }
+    choice = ['y', 'n']
+    while supplement != None:
+        supplement = input('Add supplement (leave blank when finished): ').capitalize()
+        if supplement == '':
+            with shelve.open('supplement') as db:
+                db['supplements'] = userDict
+
+            break
+        confirm = input(f"You want to add {supplement} to your list? (y/n): ").lower()
+        while True:
+            if confirm == 'y':
+                userDict[supplement] = ''
+                break
+            elif confirm == 'n':
+                break
+
+
+print(userDict)
+def didYouTake(userDict:dict):
+    today = date.today()
+    supplementList = 0
+    while supplementList != len(userDict):
+        for k in userDict.keys():
+            while True:
+                supplement = input(f'Did you take your {k} today (y/n): ').lower()
+                if supplement == 'y':
+                    userDict.update({k:today})
+                    supplementList += 1
+                    break
+                elif supplement == 'n':
+                    input(f'Go take your {k} right now!....')
+                    continue
+                
+        return userDict
 num = 1
 choice = 0
 while choice == 0:
@@ -46,9 +68,7 @@ while choice == 0:
         os.system('cls')
         if os.path.exists('userData.dat'):
             with shelve.open('userData') as db:
-                userDict['Protien'] = db['Protien']
-                userDict['Vitamins'] = db['Vitamins']
-                userDict['Creatine'] = db['Creatine']
+                userDict = db
                 
             for k,v in userDict.items():
                 print(f"{k}: {v}")
@@ -61,22 +81,9 @@ while choice == 0:
             input("Return to main menu.....")
         
     while choice == 2:
-        choice = 2.1
-        while choice == 2.1:
-            os.system('cls')
-            item = 'Protien'
-            item, choice, userDict = didYouTake(item=item, choice=choice, userDict=userDict) 
-            
-        while choice == 2.2:
-            os.system('cls')
-            item = 'Vitamins'
-            item, choice, userDict = didYouTake(item=item, choice=choice, userDict=userDict) 
-            
-        while choice == 2.3000000000000003:
-            os.system('cls')
-            item = 'Creatine'
-            item, choice, userDict = didYouTake(item=item, choice=choice, userDict=userDict)
-            choice = 0 
+        userDict = didYouTake(userDict=userDict)
+        with shelve.open('supplement') as db:
+            db = userDict
             
         while choice == 3:
             exit()
