@@ -1,5 +1,5 @@
 
-# Vitamin and Protein Intake Tracker
+# Supplement Tracker
 This Python program allows the user to track their vitamin and protein intake. It makes use of the date, shelve, pprint, and os modules.
 
 ## Dictionary Definitions
